@@ -1,39 +1,29 @@
 # Lookahead Branching for Neural Network Verification
 
-Complete neural network verifiers spend the majority of their time inside a
-branch-and-bound search whose efficiency is dominated by the order in which
-piecewise-linear constraints (typically ReLU activations) are split. We
-propose a lookahead branching heuristic that, at each branching point near
-the top of the search tree, performs a bounded trial exploration of several
-candidate splits and scores each candidate by how many additional phases its
-splits collectively force through bound propagation. The constraint whose
-splits propagate the most information is then chosen for the real split. We
-integrate the heuristic into two state-of-the-art verifiers — Marabou and
-α,β-CROWN — and show that it consistently improves solved counts and time on
-hard verification instances drawn from NN4Sys, NAP, MNIST-20×20, and the
-VNN-COMP benchmark suites, with the overhead of lookahead amortized by the
-size of the search subtree it prunes.
+This repository contains the implementation and benchmarks accompanying
+*Lookahead Branching for Neural Network Verification*, to appear at 
+IJCAI 2026. Lookahead branching is a general branching heuristic for 
+branch-and-bound-based neural network verifiers that improves branching decisions by
+simulating candidate splits to a specified depth and aggregating scores across the resulting
+branches. This repository contains the source code and benchmarks for both
+Marabou and α-β-CROWN.
 
-To appear at the *35th International Joint Conference on Artificial
-Intelligence (IJCAI 2026)*.
+If you use lookahead branching in your work, please use the following bibtex:
 
 ```bibtex
 @inproceedings{davis2026lookahead,
   title     = {Lookahead Branching for Neural Network Verification},
-  author    = {Davis, Liam and others},
+  author    = {Davis, Liam and Zhou, Duo and Zhang, Huan and Katz, Guy and Barrett, Clark and Wu, Haoze},
   booktitle = {Proceedings of the 35th International Joint Conference on
                Artificial Intelligence (IJCAI)},
   year      = {2026}
 }
 ```
 
-## Disclaimer
-
-The Marabou and α,β-CROWN forks bundled here are pinned to **older upstream
-versions** of each solver. In particular, α,β-CROWN has seen significant
-upstream changes since we forked it, and the bundled fork should be treated
-as the snapshot evaluated in the paper rather than a maintained library. We
-are also rebuilding Marabou 3 from scratch as a parallel effort, and once
+The Marabou and α,β-CROWN forks bundled here are pinned to older upstream versions of each solver. 
+In particular, α,β-CROWN has seen significant upstream changes, and we are currently building 
+Marabou 3.0 from scratch. The bundled fork should be treated
+as the snapshot evaluated in the paper rather than a maintained library. Once
 new lookahead-branching implementations land on top of the current
 generation of either solver, this repository will be updated to reflect
 those artifacts.
