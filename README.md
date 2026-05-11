@@ -1,15 +1,46 @@
-# Lookahead Branching
+# Lookahead Branching for Neural Network Verification
 
-Source code, modified solvers, and benchmarks for the IJCAI 2026 paper on
-lookahead branching for neural network verification. The repository contains:
+Complete neural network verifiers spend the majority of their time inside a
+branch-and-bound search whose efficiency is dominated by the order in which
+piecewise-linear constraints (typically ReLU activations) are split. We
+propose a lookahead branching heuristic that, at each branching point near
+the top of the search tree, performs a bounded trial exploration of several
+candidate splits and scores each candidate by how many additional phases its
+splits collectively force through bound propagation. The constraint whose
+splits propagate the most information is then chosen for the real split. We
+integrate the heuristic into two state-of-the-art verifiers — Marabou and
+α,β-CROWN — and show that it consistently improves solved counts and time on
+hard verification instances drawn from NN4Sys, NAP, MNIST-20×20, and the
+VNN-COMP benchmark suites, with the overhead of lookahead amortized by the
+size of the search subtree it prunes.
 
-- A fork of [Marabou](https://github.com/NeuralNetworkVerification/Marabou)
-  with the lookahead branching heuristic integrated into its SMT search loop.
-- A fork of [α,β-CROWN](https://github.com/Verified-Intelligence/Verifier_Development)
-  with a multi-level lookahead branching variant of FSB.
-- The three benchmark suites used in the paper.
+To appear at the *35th International Joint Conference on Artificial
+Intelligence (IJCAI 2026)*.
 
-## Repository layout
+```bibtex
+@inproceedings{davis2026lookahead,
+  title     = {Lookahead Branching for Neural Network Verification},
+  author    = {Davis, Liam and others},
+  booktitle = {Proceedings of the 35th International Joint Conference on
+               Artificial Intelligence (IJCAI)},
+  year      = {2026}
+}
+```
+
+## Disclaimer
+
+The Marabou and α,β-CROWN forks bundled here are pinned to **older upstream
+versions** of each solver. In particular, α,β-CROWN has seen significant
+upstream changes since we forked it, and the bundled fork should be treated
+as the snapshot evaluated in the paper rather than a maintained library. We
+are also rebuilding Marabou 3 from scratch as a parallel effort, and once
+new lookahead-branching implementations land on top of the current
+generation of either solver, this repository will be updated to reflect
+those artifacts.
+
+## Instructions
+
+### Repository layout
 
 ```
 .
@@ -24,7 +55,7 @@ lookahead branching for neural network verification. The repository contains:
     └── mnist20x20.list     One instance per line
 ```
 
-## Building Marabou
+### Building Marabou
 
 Requires CMake ≥ 3.16, a C++17 compiler, and Boost / OpenBLAS / pybind11
 (downloaded automatically by the build). Optional: Gurobi.
@@ -38,12 +69,12 @@ cmake --build . -j8
 
 The binary is written to `marabou/build/Marabou`.
 
-## Running Marabou experiments
+### Running Marabou experiments
 
 Lookahead branching is enabled with `--lookahead-branching`. The two branching
 heuristics evaluated in the paper are `babsr` and `pseudo-impact`.
 
-### NN4Sys (ONNX + VNN-LIB)
+#### NN4Sys (ONNX + VNN-LIB)
 
 ```bash
 while read onnx vnnlib; do
@@ -52,7 +83,7 @@ while read onnx vnnlib; do
 done < benchmarks/nn4sys.list
 ```
 
-### NAP (input queries)
+#### NAP (input queries)
 
 ```bash
 while read ipq; do
@@ -61,7 +92,7 @@ while read ipq; do
 done < benchmarks/nap.list
 ```
 
-### MNIST 20×20 (input queries, native LP)
+#### MNIST 20×20 (input queries, native LP)
 
 ```bash
 while read ipq; do
@@ -88,7 +119,7 @@ The recursion depth used *inside* `branchWithLookahead` (i.e. how many trial
 splits deep we go when estimating phase fixes) is exposed as the runtime option
 `MAX_LOOKAHEAD_DEPTH` (default 2) in `marabou/src/configuration/Options.cpp`.
 
-## Setting up α,β-CROWN
+### Setting up α,β-CROWN
 
 ```bash
 cd alpha-beta-crown
@@ -100,7 +131,7 @@ The lookahead branching heuristic is implemented in
 `alpha-beta-crown/complete_verifier/heuristics/lookahead.py` and dispatched
 from `alpha-beta-crown/complete_verifier/heuristics/branching_heuristics.py`.
 
-## Running α,β-CROWN experiments
+### Running α,β-CROWN experiments
 
 The configs used in the paper live under
 `alpha-beta-crown/complete_verifier/exp_configs/`. Selected configs:
@@ -126,7 +157,7 @@ The configs reference models and datasets via paths relative to
 `complete_verifier/`; VNN-COMP benchmarks are downloaded by the upstream
 α,β-CROWN tooling and are not bundled here.
 
-## Reproducing the paper's tables
+### Reproducing the paper's tables
 
 The depth, candidate-pool, and phase-fixing ablations correspond to the three
 `GlobalConfiguration` constants above and the runtime `MAX_LOOKAHEAD_DEPTH`
